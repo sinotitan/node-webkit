@@ -55,7 +55,9 @@
 #include "webkit/common/webpreferences.h"
 #include "webkit/common/user_agent/user_agent_util.h"
 #include "webkit/plugins/npapi/plugin_list.h"
-
+#include "net/url_request/url_request_context_getter.h"
+#include "net/ssl/ssl_cert_request_info.h"
+#include "net/cert/x509_certificate.h"
 
 namespace content {
 
@@ -316,5 +318,15 @@ bool ShellContentBrowserClient::IsHandledURL(const GURL& url) {
   }
   return false;
 }
-
+void ShellContentBrowserClient::SelectClientCertificate(
+      int render_process_id,
+      int render_view_id,
+      const net::HttpNetworkSession* network_session,
+      net::SSLCertRequestInfo* cert_request_info,
+      const base::Callback<void(net::X509Certificate*)>& callback){
+   net::X509Certificate* cert = cert_request_info->client_certs[0].get();
+   base::Callback<void(net::X509Certificate*)> callback_(callback);
+   callback_.Run(cert);
+   callback_.Reset();
+}
 }  // namespace content
